@@ -7,15 +7,15 @@ USER root
 ENV PYTHON_VERSION=3.7.6 \
     SSL_VERSION=1_1_1d
 
-RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
+RUN yum install -y wget && \
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
     wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
     yum -y install epel-release && \
     wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo && \
     yum clean all && \
     yum makecache 
     
-RUN yum install -y wget && \
-    wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.gz && \
+RUN wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.gz && \
     tar -zxf OpenSSL_${SSL_VERSION}.tar.gz && \
     yum -y install gcc automake autoconf libtool make zlib zlib-devel  libffi-devel mariadb-devel && \
     cd openssl-OpenSSL_${SSL_VERSION} && \
