@@ -13,23 +13,26 @@ RUN yum install -y wget && \
     yum -y install epel-release && \
     wget -O /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo && \
     yum clean all && \
-    yum makecache 
+    yum makecache && \
+    rm -rf /var/cache/yum/* \
+    rm -fr /tmp/*
     
-RUN wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.gz && \
+RUN yum -y install gcc automake autoconf libtool make zlib zlib-devel  libffi-devel mariadb-devel && \
+    wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.gz && \
     tar -zxf OpenSSL_${SSL_VERSION}.tar.gz && \
-    yum -y install gcc automake autoconf libtool make zlib zlib-devel  libffi-devel mariadb-devel && \
     cd openssl-OpenSSL_${SSL_VERSION} && \
     ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl shared zlib && \
     make && make install && \
-    if [ -f '/usr/bin/openssl' ];then mv /usr/bin/openssl /usr/bin/openssl.bak;fi && \
-    if [-d '/usr/include/openssl' ];then mv /usr/include/openssl/ /usr/include/openssl.bak;fi && \
+    if [ -f '/usr/bin/openssl' ];then rm -rf /usr/bin/openssl;fi && \
+    if [-d '/usr/include/openssl' ];then rm -rf /usr/include/openssl;fi && \
     ln -s /usr/local/openssl/include/openssl /usr/include/openssl && \
     ln -s /usr/local/openssl/lib/libssl.so.1.1 /usr/local/lib64/libssl.so && \
     ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl && \
     echo 'pathmunge /usr/local/openssl/bin' > /etc/profile.d/openssl.sh && \
     echo '/usr/local/openssl/lib' > /etc/ld.so.conf.d/openssl-${SSL_VERSION}.conf && \
     ldconfig -v && \
-    cd .. && rm -rf *OpenSSL_${SSL_VERSION}* && \
+    cd .. && \
+    rm -rf *OpenSSL_${SSL_VERSION}* && \
     wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz && \
     tar -Jxf Python-${PYTHON_VERSION}.tar.xz && \
     cd Python-${PYTHON_VERSION} && \
@@ -41,7 +44,8 @@ RUN wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.g
     sed -i 's/\/usr\/bin\/python/\/usr\/bin\/python2.7/g' /usr/bin/yum-config-manager && \
     sed -i 's/\/usr\/bin\/python/\/usr\/bin\/python2.7/g' /usr/libexec/urlgrabber-ext-down && \
     sed -i 's/\/usr\/bin\/python/\/usr\/bin\/python2.7/g' /usr/bin/yum && \
-    cd .. && rm -rf Python-${PYTHON_VERSION}* && \
+    cd .. && \
+    rm -rf Python-${PYTHON_VERSION}* && \
     mkdir -p ~/.pip/ && \
     echo "[global]" > ~/.pip/pip.conf && \
     echo "index-url = https://pypi.tuna.tsinghua.edu.cn/simple" >> ~/.pip/pip.conf && \
@@ -49,4 +53,6 @@ RUN wget https://github.com/openssl/openssl/archive/OpenSSL_${SSL_VERSION}.tar.g
     python -v && \
     yum install -y openssl && \
     yum clean all && \
-    rm -rf /var/cache/yum/*
+    rm -rf /var/cache/yum/* \
+    yum clean all && \
+    rm -fr /tmp/*
